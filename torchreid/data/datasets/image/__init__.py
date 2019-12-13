@@ -8,6 +8,7 @@ from .cuhk01 import CUHK01
 from .cuhk02 import CUHK02
 from .cuhk03 import CUHK03
 from .msmt17 import MSMT17
+from .msmt17_new import MSMT17_NEW
 from .sensereid import SenseReID
 from .market1501 import Market1501
 from .dukemtmcreid import DukeMTMCreID
