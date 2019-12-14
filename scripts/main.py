@@ -25,7 +25,7 @@ def build_datamanager(cfg):
         return torchreid.data.VideoDataManager(**videodata_kwargs(cfg))
 
 
-def build_engine(cfg, datamanager, model, optimizer, scheduler):
+def build_engine(cfg, datamanager, model, optimizer, scheduler, **kwargs):
     if cfg.data.type == 'image':
         if cfg.loss.name == 'softmax':
             engine = torchreid.engine.ImageSoftmaxEngine(
@@ -34,7 +34,8 @@ def build_engine(cfg, datamanager, model, optimizer, scheduler):
                 optimizer=optimizer,
                 scheduler=scheduler,
                 use_gpu=cfg.use_gpu,
-                label_smooth=cfg.loss.softmax.label_smooth
+                label_smooth=cfg.loss.softmax.label_smooth,
+                **kwargs
             )
 
         else:
@@ -47,7 +48,8 @@ def build_engine(cfg, datamanager, model, optimizer, scheduler):
                 weight_x=cfg.loss.triplet.weight_x,
                 scheduler=scheduler,
                 use_gpu=cfg.use_gpu,
-                label_smooth=cfg.loss.softmax.label_smooth
+                label_smooth=cfg.loss.softmax.label_smooth,
+                **kwargs
             )
 
     else:
@@ -177,7 +179,8 @@ def main():
     print(
         'Building {}-engine for {}-reid'.format(cfg.loss.name, cfg.data.type)
     )
-    engine = build_engine(cfg, datamanager, model, optimizer, scheduler)
+    print("**cfg.caffe", cfg.caffe)
+    engine = build_engine(cfg, datamanager, model, optimizer, scheduler, **cfg.caffe)
     engine.run(**engine_run_kwargs(cfg))
 
 

@@ -74,10 +74,11 @@ class ImageTripletEngine(Engine):
         weight_x=1,
         scheduler=None,
         use_gpu=True,
-        label_smooth=True
+        label_smooth=True,
+        **kwargs
     ):
         super(ImageTripletEngine, self
-              ).__init__(datamanager, model, optimizer, scheduler, use_gpu)
+              ).__init__(datamanager, model, optimizer, scheduler, use_gpu, **kwargs)
 
         self.weight_t = weight_t
         self.weight_x = weight_x

@@ -23,8 +23,8 @@ def get_default_config():
     cfg.data.width = 128 # image width
     cfg.data.combineall = False # combine train, query and gallery for training
     cfg.data.transforms = ['random_flip'] # data augmentation
-    cfg.data.norm_mean = [0.485, 0.456, 0.406] # default is imagenet mean
-    cfg.data.norm_std = [0.229, 0.224, 0.225] # default is imagenet std
+    cfg.data.norm_mean = [0., 0., 0.] # default is imagenet mean
+    cfg.data.norm_std = [0., 0., 0.] # default is imagenet std
     cfg.data.save_dir = 'log' # path to save log
     cfg.data.load_train_targets = False
 
@@ -102,6 +102,12 @@ def get_default_config():
     cfg.test.visrank = False # visualize ranked results (only available when cfg.test.evaluate=True)
     cfg.test.visrank_topk = 10 # top-k ranks to visualize
     cfg.test.visactmap = False # visualize CNN activation maps
+
+    # caffe-test
+    cfg.caffe = CN()
+    cfg.caffe.model_type = 'caffe'
+    cfg.caffe.prototxt = ''
+    cfg.caffe.weights = ''
 
     return cfg
 

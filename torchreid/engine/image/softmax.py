@@ -65,10 +65,11 @@ class ImageSoftmaxEngine(Engine):
         optimizer,
         scheduler=None,
         use_gpu=True,
-        label_smooth=True
+        label_smooth=True,
+        **kwargs
     ):
         super(ImageSoftmaxEngine, self
-              ).__init__(datamanager, model, optimizer, scheduler, use_gpu)
+              ).__init__(datamanager, model, optimizer, scheduler, use_gpu, **kwargs)
 
         self.criterion = CrossEntropyLoss(
             num_classes=self.datamanager.num_train_pids,

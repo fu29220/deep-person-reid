@@ -32,7 +32,8 @@ class Engine(object):
         model,
         optimizer=None,
         scheduler=None,
-        use_gpu=True
+        use_gpu=True,
+        **kwargs
     ):
         self.datamanager = datamanager
         self.model = model
@@ -42,6 +43,16 @@ class Engine(object):
         self.writer = None
         self.train_loader = self.datamanager.train_loader
         self.test_loader = self.datamanager.test_loader
+        self.model_type = kwargs.get("model_type", None)
+
+        if self.model_type == "caffe":
+            caffe_prototxt=kwargs.get("prototxt", None)
+            caffe_weights=kwargs.get("weights", None)
+            if caffe_prototxt and caffe_weights:
+                import caffe
+                caffe.set_mode_gpu()
+                caffe.set_device(3)
+                self.caffe_net = caffe.Net(caffe_prototxt, caffe.TEST, weights=caffe_weights)
 
     def run(
         self,
@@ -251,12 +262,12 @@ class Engine(object):
             f_, pids_, camids_ = [], [], []
             for batch_idx, data in enumerate(data_loader):
                 imgs, pids, camids = self._parse_data_for_eval(data)
-                if self.use_gpu:
-                    imgs = imgs.cuda()
+                #if self.use_gpu:
+                #    imgs = imgs.cuda()
                 end = time.time()
                 features = self._extract_features(imgs)
                 batch_time.update(time.time() - end)
-                features = features.data.cpu()
+                #features = features.data.cpu()
                 f_.append(features)
                 pids_.extend(pids)
                 camids_.extend(camids)
@@ -330,8 +341,18 @@ class Engine(object):
         return loss
 
     def _extract_features(self, input):
-        self.model.eval()
-        return self.model(input)
+        if self.model_type == "pth":
+            self.model.eval()
+            return self.model(input)
+        elif self.model_type == "caffe":
+            input = input.numpy()
+            self.caffe_net.blobs['data'].reshape(*input.shape)
+            self.caffe_net.blobs['data'].data[...] = input
+            self.caffe_net.forward()
+            key = list(self.caffe_net.blobs.keys())[-1]
+            data = self.caffe_net.blobs[key].data
+            return torch.from_numpy(data)
+
 
     def _parse_data_for_train(self, data):
         imgs = data[0]
